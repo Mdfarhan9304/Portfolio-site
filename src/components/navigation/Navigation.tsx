@@ -1,16 +1,32 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 const Navigation = () => {
-    const pathname = usePathname();
+    const [activeSection, setActiveSection] = useState('home');
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         setAudio(new Audio('/clickk.mp3'));
+
+        const handleScroll = () => {
+            const sections = ['home', 'about', 'projects', 'contact'];
+            const currentSection = sections.find(section => {
+                const element = document.getElementById(section);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    return rect.top <= 100 && rect.bottom >= 100;
+                }
+                return false;
+            });
+            if (currentSection) {
+                setActiveSection(currentSection);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     const playSound = () => {
@@ -20,9 +36,17 @@ const Navigation = () => {
         }
     };
 
+    const scrollToSection = (sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            playSound();
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     const navItems = [
         { 
-            path: '/', 
+            id: 'home', 
             label: 'Home', 
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +55,7 @@ const Navigation = () => {
             )
         },
         { 
-            path: '/about', 
+            id: 'about', 
             label: 'About', 
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +64,7 @@ const Navigation = () => {
             )
         },
         { 
-            path: '/projects', 
+            id: 'projects', 
             label: 'Projects', 
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +73,7 @@ const Navigation = () => {
             )
         },
         { 
-            path: '/contact', 
+            id: 'contact', 
             label: 'Contact', 
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,17 +102,16 @@ const Navigation = () => {
                     
                     <div className="flex items-center gap-8">
                         {navItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                href={item.path}
+                            <button
+                                key={item.id}
+                                onClick={() => scrollToSection(item.id)}
                                 className="relative"
-                                onMouseEnter={() => setHoveredItem(item.path)}
+                                onMouseEnter={() => setHoveredItem(item.id)}
                                 onMouseLeave={() => setHoveredItem(null)}
-                                onClick={playSound}
                             >
                                 <motion.div
                                     className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                                        pathname === item.path
+                                        activeSection === item.id
                                             ? 'text-blue-400 bg-blue-400/10'
                                             : 'text-white/60 hover:text-white'
                                     }`}
@@ -97,14 +120,14 @@ const Navigation = () => {
                                 >
                                     {item.label}
                                 </motion.div>
-                                {(hoveredItem === item.path || pathname === item.path) && (
+                                {(hoveredItem === item.id || activeSection === item.id) && (
                                     <motion.div
                                         layoutId="desktop-indicator"
                                         className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-400 rounded-full"
                                         transition={{ duration: 0.2 }}
                                     />
                                 )}
-                            </Link>
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -119,22 +142,21 @@ const Navigation = () => {
             >
                 <div className="flex items-center justify-around px-4 py-3">
                     {navItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            href={item.path}
+                        <button
+                            key={item.id}
+                            onClick={() => scrollToSection(item.id)}
                             className="relative flex flex-col items-center gap-1 p-2 min-w-[60px]"
-                            onClick={playSound}
                         >
                             <motion.div
                                 className={`flex items-center justify-center w-8 h-8 transition-all duration-300 ${
-                                    pathname === item.path
+                                    activeSection === item.id
                                         ? 'text-blue-400 scale-110'
                                         : 'text-white/50'
                                 }`}
                                 whileTap={{ scale: 0.85 }}
                                 animate={{
-                                    scale: pathname === item.path ? 1.1 : 1,
-                                    y: pathname === item.path ? -2 : 0
+                                    scale: activeSection === item.id ? 1.1 : 1,
+                                    y: activeSection === item.id ? -2 : 0
                                 }}
                                 transition={{ duration: 0.2 }}
                             >
@@ -143,19 +165,19 @@ const Navigation = () => {
                             
                             <motion.span
                                 className={`text-xs font-medium transition-all duration-300 ${
-                                    pathname === item.path
+                                    activeSection === item.id
                                         ? 'text-blue-400 scale-105'
                                         : 'text-white/50'
                                 }`}
                                 animate={{
-                                    scale: pathname === item.path ? 1.05 : 1,
-                                    fontWeight: pathname === item.path ? 600 : 500
+                                    scale: activeSection === item.id ? 1.05 : 1,
+                                    fontWeight: activeSection === item.id ? 600 : 500
                                 }}
                             >
                                 {item.label}
                             </motion.span>
                             
-                            {pathname === item.path && (
+                            {activeSection === item.id && (
                                 <motion.div
                                     layoutId="mobile-indicator"
                                     className="absolute -top-1 left-1/2 w-1 h-1 bg-blue-400 rounded-full"
@@ -163,7 +185,7 @@ const Navigation = () => {
                                     transition={{ duration: 0.3, ease: "easeOut" }}
                                 />
                             )}
-                        </Link>
+                        </button>
                     ))}
                 </div>
             </motion.nav>

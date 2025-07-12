@@ -1,15 +1,25 @@
 'use client';
 import Hero from "@/components/sections/Hero";
+import About from "@/components/sections/About";
+import Projects from "@/components/sections/Projects";
+import Contact from "@/components/sections/Contact";
 import Navigation from "@/components/navigation/Navigation";
+import TechStack from "@/components/sections/TechStack";
 
 export default function Home() {
   return (
-    <main className="min-h-screen my-auto bg-black">
+    <main className="bg-black">
       <Navigation />
-      <Hero />
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        {/* Add your other sections here */}
-      </div>
+      
+      {/* Home Section */}
+      <section id="home" className="min-h-screen">
+        <Hero />
+      </section>
+
+      {/* Other Sections */}
+      <TechStack />
+      <Projects />
+      <Contact />
     </main>
   );
 }
