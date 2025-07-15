@@ -4,6 +4,7 @@ import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { motion } from 'framer-motion';
 import { AnimatedBorderImage } from "@/components/ui/animated-border-image";
 import { Badge } from "../ui/badge";
+import { AnimatedBadge } from "../ui/animated-badge";
 
 export default function Hero() {
   return (
@@ -11,7 +12,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-grid-white/[0.02] pointer-events-none" />
       <Spotlight />
       <div className="relative z-10 p-4 w-full max-w-4xl mx-auto flex flex-col items-center justify-center gap-8">
-        <Badge text="Available for freelance work ✨" />
+        <AnimatedBadge text="Available for freelance work ✨" />
         {/* Image */}
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
